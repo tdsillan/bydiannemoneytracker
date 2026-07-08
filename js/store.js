@@ -19,6 +19,7 @@ function defaultState() {
       accentColor: "#2563eb",
       darkMode: false,
       netWorthCurrencies: ["SEK", "PHP"],
+      iosBannerDismissed: false,
     },
     categories: {
       expense: ["Housing", "Utilities", "Groceries", "Transportation", "Dining Out", "Health", "Entertainment", "Shopping", "Subscriptions", "Insurance", "Education", "Family remittance", "Other"],

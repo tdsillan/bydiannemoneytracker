@@ -2,7 +2,7 @@ function applyTheme() {
   const s = Store.state.settings;
   document.documentElement.style.setProperty("--accent", s.accentColor);
   document.documentElement.style.setProperty("--accent-soft", s.accentColor + "1a");
-  document.body.classList.toggle("dark", !!s.darkMode);
+  document.documentElement.classList.toggle("dark", !!s.darkMode);
   const name = s.userName.trim();
   document.getElementById("brandTitle").textContent = name ? `${name}'s Money Tracker` : "My Money Tracker";
 }

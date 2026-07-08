@@ -117,7 +117,7 @@ function initInstallPrompt() {
   const iosBanner = document.getElementById("iosInstallBanner");
 
   if (isIOS()) {
-    if (iosBanner) iosBanner.hidden = false;
+    if (iosBanner && !Store.state.settings.iosBannerDismissed) iosBanner.hidden = false;
     return;
   }
 
@@ -165,6 +165,8 @@ function initPWA() {
   if (iosDismiss) {
     iosDismiss.addEventListener("click", () => {
       document.getElementById("iosInstallBanner").hidden = true;
+      Store.state.settings.iosBannerDismissed = true;
+      Store.save();
     });
   }
 }
