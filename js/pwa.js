@@ -1,5 +1,5 @@
 let deferredInstallPrompt = null;
-const SW_VERSION = "14";
+const SW_VERSION = "15";
 
 function drawDefaultIcon(ctx, size) {
   const accent = Store.state.settings.accentColor || "#2563eb";
@@ -89,10 +89,10 @@ async function regenerateManifest() {
 
 function handleAppIconUpload(file) {
   const reader = new FileReader();
-  reader.onload = () => {
+  reader.onload = async () => {
     Store.setAppIcon(reader.result);
-    regenerateManifest();
-    showToast("App icon updated");
+    await regenerateManifest();
+    showToast("App icon updated — reload this page, then reinstall the app to see it on your home screen", 5000);
   };
   reader.readAsDataURL(file);
 }

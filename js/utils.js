@@ -122,12 +122,12 @@ function escapeHtml(str) {
   return div.innerHTML;
 }
 
-function showToast(message) {
+function showToast(message, duration) {
   const toast = document.getElementById("toast");
   toast.textContent = message;
   toast.classList.add("show");
   clearTimeout(showToast._t);
-  showToast._t = setTimeout(() => toast.classList.remove("show"), 2400);
+  showToast._t = setTimeout(() => toast.classList.remove("show"), duration || 2400);
 }
 
 function uid() {
