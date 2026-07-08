@@ -1,5 +1,5 @@
 let deferredInstallPrompt = null;
-const SW_VERSION = "12";
+const SW_VERSION = "13";
 
 function drawDefaultIcon(ctx, size) {
   const accent = Store.state.settings.accentColor || "#2563eb";
@@ -107,20 +107,10 @@ function isStandaloneDisplay() {
   return window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
 }
 
-function isIOS() {
-  return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-}
-
 function initInstallPrompt() {
   if (isStandaloneDisplay()) return;
 
   const installBtn = document.getElementById("installAppBtn");
-  const iosBanner = document.getElementById("iosInstallBanner");
-
-  if (isIOS()) {
-    if (iosBanner && !Store.state.settings.iosBannerDismissed) iosBanner.hidden = false;
-    return;
-  }
 
   window.addEventListener("beforeinstallprompt", (e) => {
     e.preventDefault();
@@ -140,7 +130,6 @@ function initInstallPrompt() {
 
   window.addEventListener("appinstalled", () => {
     if (installBtn) installBtn.hidden = true;
-    if (iosBanner) iosBanner.hidden = true;
   });
 }
 
@@ -179,13 +168,4 @@ function initPWA() {
     e.target.value = "";
   });
   document.getElementById("resetAppIconBtn").addEventListener("click", resetAppIcon);
-
-  const iosDismiss = document.getElementById("iosInstallDismiss");
-  if (iosDismiss) {
-    iosDismiss.addEventListener("click", () => {
-      document.getElementById("iosInstallBanner").hidden = true;
-      Store.state.settings.iosBannerDismissed = true;
-      Store.save();
-    });
-  }
 }
