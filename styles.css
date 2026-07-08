@@ -620,6 +620,7 @@ label { font-size: 12px; color: var(--text-muted); font-weight: 600; display: fl
   box-shadow: var(--shadow-hover);
   z-index: 60;
 }
+.ios-install-banner[hidden] { display: none; }
 .ios-install-banner strong { font-weight: 700; }
 .ios-install-banner .icon-btn { color: var(--bg); flex-shrink: 0; }
 

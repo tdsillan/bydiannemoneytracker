@@ -1,5 +1,5 @@
-const CACHE_VERSION = "v11";
-const ASSET_VERSION = "11";
+const CACHE_VERSION = "v12";
+const ASSET_VERSION = "12";
 const CACHE_NAME = `finance-tracker-${CACHE_VERSION}`;
 
 const APP_SHELL = [
@@ -50,10 +50,7 @@ self.addEventListener("fetch", (event) => {
   if (request.method !== "GET") return;
 
   const url = new URL(request.url);
-  if (url.origin !== self.location.origin) {
-    event.respondWith(fetch(request).catch(() => new Response("", { status: 503 })));
-    return;
-  }
+  if (url.origin !== self.location.origin) return;
 
   event.respondWith(
     caches.match(request).then((cached) => {
