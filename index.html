@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>My Money Tracker</title>
+<meta name="theme-color" content="#2563eb">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="MoneyTracker">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon.svg">
+<link rel="stylesheet" href="styles.css?v=6">
+</head>
+<body>
+
+<div class="app">
+
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">₮</div>
+      <div class="brand-text">
+        <div class="brand-title" id="brandTitle">My Money Tracker</div>
+        <div class="brand-sub" id="brandSub">Personal finance, in one place</div>
+      </div>
+    </div>
+
+    <nav class="nav">
+      <button class="nav-item active" data-view="dashboard">
+        <span class="nav-icon">◆</span> Dashboard
+      </button>
+      <button class="nav-item" data-view="debts">
+        <span class="nav-icon">◇</span> Loans &amp; Debts
+      </button>
+      <button class="nav-item" data-view="goals">
+        <span class="nav-icon">◈</span> Savings Goals
+      </button>
+      <button class="nav-item" data-view="expenses">
+        <span class="nav-icon">◉</span> Expenses &amp; Income
+      </button>
+      <button class="nav-item" data-view="remittances">
+        <span class="nav-icon">⇄</span> Remittances
+      </button>
+      <button class="nav-item" data-view="networth">
+        <span class="nav-icon">▦</span> Net Worth
+      </button>
+      <button class="nav-item" data-view="contributions">
+        <span class="nav-icon">▣</span> Contributions
+      </button>
+      <button class="nav-item" data-view="planning">
+        <span class="nav-icon">◎</span> Planning
+      </button>
+      <button class="nav-item" data-view="settings">
+        <span class="nav-icon">⚙</span> Settings
+      </button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <button id="installAppBtn" class="btn-ghost small install-btn" hidden>&#8595; Install App</button>
+      <button id="exportBtn" class="btn-ghost small">Export backup</button>
+      <label class="btn-ghost small" for="importFile">Import backup</label>
+      <input type="file" id="importFile" accept="application/json" hidden>
+    </div>
+  </aside>
+
+  <div class="ios-install-banner" id="iosInstallBanner" hidden>
+    <span>Install this app: tap <strong>Share</strong> then <strong>Add to Home Screen</strong>.</span>
+    <button id="iosInstallDismiss" class="icon-btn">&times;</button>
+  </div>
+
+  <main class="content">
+
+    <section id="view-dashboard" class="view active">
+      <header class="view-header">
+        <div class="header-title-row">
+          <span class="header-icon dashboard">◆</span>
+          <div>
+            <h1 id="greeting">Welcome back</h1>
+            <p class="muted" id="todayLabel"></p>
+          </div>
+        </div>
+      </header>
+
+      <div class="stat-grid" id="statGrid"></div>
+
+      <div class="panel">
+        <div class="panel-header"><h2>Balance on hand</h2></div>
+        <div id="accountBalances" class="card-list"></div>
+      </div>
+
+      <div class="panel-grid">
+        <div class="panel">
+          <div class="panel-header row">
+            <h2>Spending by category <span class="muted small">(this month)</span></h2>
+            <select id="chartCurrencySelect"></select>
+          </div>
+          <div id="categoryChart" class="category-chart"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-header">
+            <h2>Last 6 months <span class="muted small" id="trendCurrencyLabel"></span></h2>
+          </div>
+          <div id="trendChart" class="trend-chart"></div>
+        </div>
+      </div>
+
+      <div class="panel-grid">
+        <div class="panel">
+          <div class="panel-header"><h2>Debt breakdown <span class="muted small" id="debtBreakdownLabel"></span></h2></div>
+          <div class="chart-with-legend">
+            <div id="debtBreakdownChart"></div>
+            <div id="debtBreakdownLegend" class="legend-list"></div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-header"><h2>Savings breakdown <span class="muted small" id="savingsBreakdownLabel"></span></h2></div>
+          <div class="chart-with-legend">
+            <div id="savingsBreakdownChart"></div>
+            <div id="savingsBreakdownLegend" class="legend-list"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-grid">
+        <div class="panel">
+          <div class="panel-header"><h2>Debts &amp; loans overview</h2></div>
+          <div id="debtOverview" class="mini-list"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-header"><h2>Savings goals overview</h2></div>
+          <div id="goalOverview" class="mini-list"></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header"><h2>Upcoming income</h2></div>
+        <div id="upcomingIncome" class="mini-list"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header"><h2>Recent activity</h2></div>
+        <div id="recentActivity" class="activity-list"></div>
+      </div>
+    </section>
+
+    <section id="view-debts" class="view">
+      <header class="view-header row">
+        <div class="header-title-row">
+          <span class="header-icon debts">◇</span>
+          <div>
+            <h1>Loans &amp; Debts</h1>
+            <p class="muted">Money you owe, and money owed to you.</p>
+          </div>
+        </div>
+        <button class="btn-primary" id="addDebtBtn">+ Add debt / loan</button>
+      </header>
+      <div class="stat-grid small-grid theme-debt" id="debtStatGrid"></div>
+      <div class="panel">
+        <div class="panel-header"><h2>Overall progress</h2></div>
+        <div id="debtOverallProgress" class="overall-progress-grid"></div>
+      </div>
+      <div class="panel">
+        <div class="panel-header"><h2>By category</h2></div>
+        <div id="debtCategoryProgress" class="overall-progress-grid"></div>
+      </div>
+      <div id="debtList" class="card-list"></div>
+    </section>
+
+    <section id="view-goals" class="view">
+      <header class="view-header row">
+        <div class="header-title-row">
+          <span class="header-icon goals">◈</span>
+          <div>
+            <h1>Savings Goals</h1>
+            <p class="muted">What you're working towards.</p>
+          </div>
+        </div>
+        <button class="btn-primary" id="addGoalBtn">+ Add goal</button>
+      </header>
+      <div class="panel">
+        <div class="panel-header"><h2>Overall progress</h2></div>
+        <div id="goalOverallProgress" class="overall-progress-grid"></div>
+      </div>
+      <div id="goalList" class="card-list goal-grid"></div>
+    </section>
+
+    <section id="view-expenses" class="view">
+      <header class="view-header row">
+        <div class="header-title-row">
+          <span class="header-icon expenses">◉</span>
+          <div>
+            <h1>Expenses &amp; Income</h1>
+            <p class="muted">Every transaction, tracked and categorized.</p>
+          </div>
+        </div>
+        <button class="btn-primary" id="addTxnBtn">+ Add transaction</button>
+      </header>
+
+      <div class="panel">
+        <div class="panel-header row">
+          <h2>Recurring income</h2>
+          <button class="btn-secondary small" id="addRecurringBtn">+ Add recurring income</button>
+        </div>
+        <div id="recurringList" class="card-list"></div>
+      </div>
+
+      <div class="filter-bar">
+        <select id="filterMonth"></select>
+        <select id="filterCategory"><option value="">All categories</option></select>
+        <select id="filterType">
+          <option value="">All types</option>
+          <option value="expense">Expenses</option>
+          <option value="income">Income</option>
+        </select>
+        <select id="filterAccount"><option value="">All accounts</option></select>
+      </div>
+
+      <div class="stat-grid small-grid theme-expenses" id="txnStatGrid"></div>
+      <div class="panel">
+        <div class="table-scroll">
+          <table class="txn-table">
+            <thead>
+              <tr><th>Date</th><th>Category</th><th>Account</th><th>Note</th><th class="right">Amount</th><th></th></tr>
+            </thead>
+            <tbody id="txnTableBody"></tbody>
+          </table>
+        </div>
+        <p id="txnEmpty" class="muted empty-msg" hidden>No transactions yet. Add your first one above.</p>
+      </div>
+    </section>
+
+    <section id="view-remittances" class="view">
+      <header class="view-header row">
+        <div class="header-title-row">
+          <span class="header-icon remittances">⇄</span>
+          <div>
+            <h1>Remittance Cost Tracker</h1>
+            <p class="muted">Every transfer, its fee, and how the rate compared to the mid-market rate.</p>
+          </div>
+        </div>
+        <button class="btn-primary" id="addRemittanceBtn">+ Log remittance</button>
+      </header>
+
+      <div class="stat-grid small-grid theme-remittances" id="remittanceStatGrid"></div>
+
+      <div class="panel">
+        <div class="panel-header"><h2>Fees &amp; spread over time</h2></div>
+        <div id="remittanceChart" class="trend-chart"></div>
+      </div>
+
+      <div class="panel">
+        <div class="table-scroll">
+          <table class="txn-table">
+            <thead>
+              <tr><th>Date</th><th>Service</th><th>Sent</th><th>Fee</th><th>Rate received</th><th>Mid-market</th><th class="right">Total cost</th><th></th></tr>
+            </thead>
+            <tbody id="remittanceTableBody"></tbody>
+          </table>
+        </div>
+        <p id="remittanceEmpty" class="muted empty-msg" hidden>No remittances logged yet. Add your first one above.</p>
+      </div>
+    </section>
+
+    <section id="view-networth" class="view">
+      <header class="view-header">
+        <div class="header-title-row">
+          <span class="header-icon networth">▦</span>
+          <div>
+            <h1>Net Worth</h1>
+            <p class="muted">Everything you own minus everything you owe, in EUR and PHP.</p>
+          </div>
+        </div>
+      </header>
+
+      <div class="networth-hero" id="networthHero"></div>
+
+      <div class="panel">
+        <div class="panel-header row">
+          <h2>Investments</h2>
+          <button class="btn-secondary small" id="addInvestmentBtn">+ Add investment</button>
+        </div>
+        <div id="investmentList" class="card-list"></div>
+      </div>
+
+      <div class="panel-grid">
+        <div class="panel">
+          <div class="panel-header"><h2>Assets</h2></div>
+          <div id="networthAssets" class="mini-list"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-header"><h2>Liabilities</h2></div>
+          <div id="networthLiabilities" class="mini-list"></div>
+        </div>
+      </div>
+      <p class="muted small" id="networthMissingRates"></p>
+    </section>
+
+    <section id="view-contributions" class="view">
+      <header class="view-header">
+        <div class="header-title-row">
+          <span class="header-icon contributions">▣</span>
+          <div>
+            <h1>SSS / PhilHealth / Pag-IBIG</h1>
+            <p class="muted">Voluntary member contributions, due dates, and running totals.</p>
+          </div>
+        </div>
+      </header>
+
+      <div id="contributionPrograms" class="card-list"></div>
+    </section>
+
+    <section id="view-planning" class="view">
+      <header class="view-header row">
+        <div class="header-title-row">
+          <span class="header-icon planning">◎</span>
+          <div>
+            <h1>Quick Financial Planning</h1>
+            <p class="muted">A simple retirement &amp; budgeting snapshot based on your income and age.</p>
+          </div>
+        </div>
+        <button class="btn-secondary" id="toggleCompareBtn">Compare Scenarios</button>
+      </header>
+
+      <div class="panel">
+        <div class="panel-header"><h2>Your numbers</h2></div>
+        <div class="form-grid">
+          <label>Monthly take-home pay
+            <input type="number" id="pl-income" min="0" step="0.01">
+          </label>
+          <label>Your age
+            <input type="number" id="pl-age" min="0" max="120" step="1">
+          </label>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header"><h2>Assumptions</h2></div>
+        <div class="form-grid">
+          <label>Retirement age
+            <input type="number" id="pl-retire-age" min="1" max="120" step="1">
+          </label>
+          <label>Investment return (%/yr)
+            <input type="number" id="pl-return-rate" min="0" step="0.1">
+          </label>
+          <label>Savings rate of income (%)
+            <input type="number" id="pl-savings-rate" min="0" max="100" step="1">
+          </label>
+          <label>PHP inflation rate (%/yr) <span class="muted small">(default 4%, adjust as you like)</span>
+            <input type="number" id="pl-inflation-rate" min="0" step="0.1">
+          </label>
+        </div>
+        <div class="form-grid" style="margin-top:14px">
+          <label>Needs (%)
+            <input type="number" id="pl-needs-pct" min="0" max="100" step="1">
+          </label>
+          <label>Wants (%)
+            <input type="number" id="pl-wants-pct" min="0" max="100" step="1">
+          </label>
+          <label>Savings (%)
+            <input type="number" id="pl-savings-pct" min="0" max="100" step="1">
+          </label>
+        </div>
+        <div class="form-grid" style="margin-top:14px">
+          <label>Emergency fund &mdash; short (months)
+            <input type="number" id="pl-ef-short" min="0" step="1">
+          </label>
+          <label>Emergency fund &mdash; long (months)
+            <input type="number" id="pl-ef-long" min="0" step="1">
+          </label>
+        </div>
+        <p class="muted small" id="plSplitWarning" hidden>Needs + Wants + Savings should add up to 100%.</p>
+      </div>
+
+      <div class="stat-grid theme-planning" id="planningStatGrid"></div>
+
+      <div class="panel-grid">
+        <div class="panel">
+          <div class="panel-header"><h2>Budget split</h2></div>
+          <div id="planningSplit" class="category-chart"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-header"><h2>Emergency fund</h2></div>
+          <div id="planningEmergencyFund" class="mini-list"></div>
+        </div>
+      </div>
+
+      <div class="panel" id="compareScenariosPanel" hidden>
+        <div class="panel-header"><h2>Compare Scenarios <span class="muted small">Built for viewers to submit numbers during a Live — A is your saved plan, B is the hypothetical</span></h2></div>
+        <div class="scenario-columns">
+          <div class="scenario-col">
+            <h3 class="small-title">Scenario A &middot; current pace</h3>
+            <div id="scenarioAStats" class="mini-list"></div>
+          </div>
+          <div class="scenario-col">
+            <h3 class="small-title">Scenario B &middot; hypothetical</h3>
+            <div class="form-grid two-col">
+              <label>Monthly take-home pay
+                <input type="number" id="plb-income" min="0" step="0.01">
+              </label>
+              <label>Savings rate (%)
+                <input type="number" id="plb-savings-rate" min="0" max="100" step="1">
+              </label>
+              <label>Investment return (%/yr)
+                <input type="number" id="plb-return-rate" min="0" step="0.1">
+              </label>
+              <label>Years to retirement
+                <input type="number" id="plb-years" min="0" step="1">
+              </label>
+            </div>
+            <div id="scenarioBStats" class="mini-list"></div>
+          </div>
+        </div>
+        <div class="scenario-chart" id="scenarioChart"></div>
+      </div>
+    </section>
+
+    <section id="view-settings" class="view">
+      <header class="view-header">
+        <div class="header-title-row">
+          <span class="header-icon settings">⚙</span>
+          <div>
+            <h1>Settings</h1>
+            <p class="muted">Make it yours.</p>
+          </div>
+        </div>
+      </header>
+
+      <div class="panel">
+        <div class="panel-header"><h2>Profile</h2></div>
+        <div class="form-grid">
+          <label>Your name
+            <input type="text" id="settingName" placeholder="e.g. Tricia">
+          </label>
+          <label>Default currency <span class="muted small">(used for new entries)</span>
+            <select id="settingCurrency"></select>
+          </label>
+          <label>Accent color
+            <input type="color" id="settingAccent">
+          </label>
+          <label class="checkbox-label">
+            <input type="checkbox" id="settingDark"> Dark mode
+          </label>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header"><h2>App icon (home screen)</h2></div>
+        <p class="muted">Upload an image to use as your icon when you "Add to Home Screen." It's automatically resized. Leave it unset to use the default.</p>
+        <div class="app-icon-row">
+          <img id="appIconPreview" class="app-icon-preview" alt="App icon preview">
+          <div class="btn-row" style="margin-top:0">
+            <label class="btn-secondary" for="appIconUpload">Upload image</label>
+            <input type="file" id="appIconUpload" accept="image/*" hidden>
+            <button class="btn-secondary" id="resetAppIconBtn">Reset to default</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header"><h2>Section icons</h2></div>
+        <p class="muted">Customize the icon shown for each tab in the sidebar.</p>
+        <div id="navIconSettings" class="mini-list"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header"><h2>Debt category icons</h2></div>
+        <p class="muted">Shown on debt cards and the category breakdown.</p>
+        <div id="debtCategoryIconSettings" class="mini-list"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header"><h2>Accounts</h2></div>
+        <p class="muted">Where your money lives — tag debts, goals, and transactions with these.</p>
+        <div id="accountTags" class="tag-list"></div>
+        <div class="inline-add">
+          <input type="text" id="newAccountName" placeholder="e.g. Wise, Revolut, Maribank">
+          <button class="btn-secondary" id="addAccountBtn">Add</button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header"><h2>Exchange rates</h2></div>
+        <p class="muted">Used to convert contributions or view totals across currencies (e.g. saving in SEK toward a PHP goal). Rates are whatever you last entered &mdash; update them whenever you check a fresh rate.</p>
+        <div id="exchangeRateList" class="card-list"></div>
+        <div class="inline-add">
+          <select id="newRateFrom"></select>
+          <span class="muted small">to</span>
+          <select id="newRateTo"></select>
+          <input type="number" id="newRateValue" min="0" step="0.0001" placeholder="Rate">
+          <button class="btn-secondary" id="addRateBtn">Add</button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header"><h2>Categories</h2></div>
+        <div class="form-grid two-col">
+          <div>
+            <h3 class="small-title">Expense categories</h3>
+            <div id="expenseCategoryTags" class="tag-list"></div>
+            <div class="inline-add">
+              <input type="text" id="newExpenseCategory" placeholder="New category">
+              <button class="btn-secondary" id="addExpenseCategoryBtn">Add</button>
+            </div>
+          </div>
+          <div>
+            <h3 class="small-title">Income categories</h3>
+            <div id="incomeCategoryTags" class="tag-list"></div>
+            <div class="inline-add">
+              <input type="text" id="newIncomeCategory" placeholder="New category">
+              <button class="btn-secondary" id="addIncomeCategoryBtn">Add</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header"><h2>Data</h2></div>
+        <p class="muted">Everything is stored locally in this browser. Export a backup regularly, especially before clearing browser data.</p>
+        <div class="btn-row">
+          <button class="btn-secondary" id="exportBtn2">Export backup (.json)</button>
+          <label class="btn-secondary" for="importFile2">Import backup</label>
+          <input type="file" id="importFile2" accept="application/json" hidden>
+          <button class="btn-danger" id="clearDataBtn">Reset all data</button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal" id="modal">
+    <div class="modal-header">
+      <h2 id="modalTitle">Title</h2>
+      <button class="modal-close" id="modalClose">&times;</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="js/store.js?v=6"></script>
+<script src="js/utils.js?v=6"></script>
+<script src="js/icons.js?v=6"></script>
+<script src="js/pwa.js?v=6"></script>
+<script src="js/modal.js?v=6"></script>
+<script src="js/dashboard.js?v=6"></script>
+<script src="js/debts.js?v=6"></script>
+<script src="js/goals.js?v=6"></script>
+<script src="js/expenses.js?v=6"></script>
+<script src="js/remittances.js?v=6"></script>
+<script src="js/networth.js?v=6"></script>
+<script src="js/contributions.js?v=6"></script>
+<script src="js/settings.js?v=6"></script>
+<script src="js/planning.js?v=6"></script>
+<script src="js/app.js?v=6"></script>
+</body>
+</html>
