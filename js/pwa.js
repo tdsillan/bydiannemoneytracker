@@ -1,4 +1,5 @@
 let deferredInstallPrompt = null;
+const SW_VERSION = "11";
 
 function drawDefaultIcon(ctx, size) {
   const accent = Store.state.settings.accentColor || "#2563eb";
@@ -145,7 +146,20 @@ function initInstallPrompt() {
 
 function initServiceWorker() {
   if (!("serviceWorker" in navigator)) return;
-  navigator.serviceWorker.register("sw.js").catch(() => {});
+  navigator.serviceWorker.register(`sw.js?v=${SW_VERSION}`).then((reg) => {
+    reg.update().catch(() => {});
+    if (reg.waiting) reg.waiting.postMessage("SKIP_WAITING");
+    reg.addEventListener("updatefound", () => {
+      const newWorker = reg.installing;
+      if (!newWorker) return;
+      newWorker.addEventListener("statechange", () => {
+        if (newWorker.state === "installed" && navigator.serviceWorker.controller) {
+          newWorker.postMessage("SKIP_WAITING");
+        }
+      });
+    });
+  }).catch(() => {});
+
   let hasReloaded = false;
   navigator.serviceWorker.addEventListener("controllerchange", () => {
     if (hasReloaded) return;

@@ -1,5 +1,5 @@
-const CACHE_VERSION = "v10";
-const ASSET_VERSION = "10";
+const CACHE_VERSION = "v11";
+const ASSET_VERSION = "11";
 const CACHE_NAME = `finance-tracker-${CACHE_VERSION}`;
 
 const APP_SHELL = [
@@ -24,6 +24,10 @@ const APP_SHELL = [
   `./js/planning.js?v=${ASSET_VERSION}`,
   `./js/app.js?v=${ASSET_VERSION}`,
 ];
+
+self.addEventListener("message", (event) => {
+  if (event.data === "SKIP_WAITING") self.skipWaiting();
+});
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
