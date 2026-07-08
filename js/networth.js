@@ -1,7 +1,26 @@
 function renderNetWorth() {
   renderInvestments();
+  renderNetWorthCurrencyPicker();
   renderNetWorthHero();
   renderNetWorthBreakdown();
+}
+
+function renderNetWorthCurrencyPicker() {
+  const [curA, curB] = Store.state.settings.netWorthCurrencies;
+  const selectA = document.getElementById("networthCurrencyA");
+  const selectB = document.getElementById("networthCurrencyB");
+  selectA.innerHTML = currencyOptionsHtml(curA);
+  selectB.innerHTML = currencyOptionsHtml(curB);
+  selectA.onchange = () => {
+    Store.state.settings.netWorthCurrencies = [selectA.value, selectB.value];
+    Store.save();
+    renderNetWorthHero();
+  };
+  selectB.onchange = () => {
+    Store.state.settings.netWorthCurrencies = [selectA.value, selectB.value];
+    Store.save();
+    renderNetWorthHero();
+  };
 }
 
 function assetsByCurrency() {
@@ -41,7 +60,7 @@ function renderNetWorthHero() {
   const el = document.getElementById("networthHero");
   const missingSet = new Set();
 
-  el.innerHTML = ["EUR", "PHP"].map((targetCur) => {
+  el.innerHTML = Store.state.settings.netWorthCurrencies.map((targetCur) => {
     const a = convertTotalsToCurrency(assets, targetCur);
     const l = convertTotalsToCurrency(liabilities, targetCur);
     a.missing.forEach((c) => missingSet.add(c));

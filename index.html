@@ -12,7 +12,7 @@
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icon.svg">
-<link rel="stylesheet" href="styles.css?v=6">
+<link rel="stylesheet" href="styles.css?v=7">
 </head>
 <body>
 
@@ -269,10 +269,19 @@
           <span class="header-icon networth">▦</span>
           <div>
             <h1>Net Worth</h1>
-            <p class="muted">Everything you own minus everything you owe, in EUR and PHP.</p>
+            <p class="muted">Everything you own minus everything you owe, in whichever currencies you pick.</p>
           </div>
         </div>
       </header>
+
+      <div class="networth-currency-picker">
+        <label>Show in
+          <select id="networthCurrencyA"></select>
+        </label>
+        <label>and
+          <select id="networthCurrencyB"></select>
+        </label>
+      </div>
 
       <div class="networth-hero" id="networthHero"></div>
 
@@ -326,6 +335,9 @@
       <div class="panel">
         <div class="panel-header"><h2>Your numbers</h2></div>
         <div class="form-grid">
+          <label>Currency
+            <select id="pl-currency"></select>
+          </label>
           <label>Monthly take-home pay
             <input type="number" id="pl-income" min="0" step="0.01">
           </label>
@@ -542,20 +554,20 @@
 
 <div class="toast" id="toast"></div>
 
-<script src="js/store.js?v=6"></script>
-<script src="js/utils.js?v=6"></script>
-<script src="js/icons.js?v=6"></script>
-<script src="js/pwa.js?v=6"></script>
-<script src="js/modal.js?v=6"></script>
-<script src="js/dashboard.js?v=6"></script>
-<script src="js/debts.js?v=6"></script>
-<script src="js/goals.js?v=6"></script>
-<script src="js/expenses.js?v=6"></script>
-<script src="js/remittances.js?v=6"></script>
-<script src="js/networth.js?v=6"></script>
-<script src="js/contributions.js?v=6"></script>
-<script src="js/settings.js?v=6"></script>
-<script src="js/planning.js?v=6"></script>
-<script src="js/app.js?v=6"></script>
+<script src="js/store.js?v=7"></script>
+<script src="js/utils.js?v=7"></script>
+<script src="js/icons.js?v=7"></script>
+<script src="js/pwa.js?v=7"></script>
+<script src="js/modal.js?v=7"></script>
+<script src="js/dashboard.js?v=7"></script>
+<script src="js/debts.js?v=7"></script>
+<script src="js/goals.js?v=7"></script>
+<script src="js/expenses.js?v=7"></script>
+<script src="js/remittances.js?v=7"></script>
+<script src="js/networth.js?v=7"></script>
+<script src="js/contributions.js?v=7"></script>
+<script src="js/settings.js?v=7"></script>
+<script src="js/planning.js?v=7"></script>
+<script src="js/app.js?v=7"></script>
 </body>
 </html>

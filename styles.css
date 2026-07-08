@@ -338,6 +338,9 @@ html, body {
 .donut-meta .line { display: flex; justify-content: space-between; gap: 10px; color: var(--text-muted); }
 .donut-meta .line strong { color: var(--text); font-weight: 700; }
 
+.networth-currency-picker { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; }
+.networth-currency-picker label { flex-direction: row; align-items: center; gap: 8px; font-weight: 600; }
+
 .networth-hero {
   display: grid;
   grid-template-columns: 1fr 1fr;

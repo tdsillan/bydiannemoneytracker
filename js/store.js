@@ -18,6 +18,7 @@ function defaultState() {
       defaultCurrency: "SEK",
       accentColor: "#2563eb",
       darkMode: false,
+      netWorthCurrencies: ["SEK", "PHP"],
     },
     categories: {
       expense: ["Housing", "Utilities", "Groceries", "Transportation", "Dining Out", "Health", "Entertainment", "Shopping", "Subscriptions", "Insurance", "Education", "Family remittance", "Other"],
@@ -37,6 +38,7 @@ function defaultState() {
       { id: "rec-allowance", name: "Allowance", amount: 0, currency: "EUR", category: "Allowance", accountId: "acc-revolut", dayOfMonth: 15 },
     ],
     planning: {
+      currency: "",
       monthlyIncome: 0,
       age: 25,
       retirementAge: 60,

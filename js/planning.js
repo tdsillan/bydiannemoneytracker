@@ -6,6 +6,7 @@ function renderPlanning() {
 
 function renderPlanningInputs() {
   const p = Store.state.planning;
+  document.getElementById("pl-currency").innerHTML = currencyOptionsHtml(p.currency || Store.state.settings.defaultCurrency);
   document.getElementById("pl-income").value = p.monthlyIncome || "";
   document.getElementById("pl-age").value = p.age || "";
   document.getElementById("pl-retire-age").value = p.retirementAge;
@@ -21,6 +22,7 @@ function renderPlanningInputs() {
 
 function readPlanningInputs() {
   return {
+    currency: document.getElementById("pl-currency").value,
     monthlyIncome: parseFloat(document.getElementById("pl-income").value) || 0,
     age: parseFloat(document.getElementById("pl-age").value) || 0,
     retirementAge: parseFloat(document.getElementById("pl-retire-age").value) || 0,
@@ -37,7 +39,7 @@ function readPlanningInputs() {
 
 function renderPlanningResults() {
   const p = readPlanningInputs();
-  const cur = Store.state.settings.defaultCurrency;
+  const cur = p.currency;
   const yearsLeft = Math.max(0, p.retirementAge - p.age);
   const monthlySavings = p.monthlyIncome * (p.savingsRatePct / 100);
   const months = Math.round(yearsLeft * 12);
@@ -119,8 +121,8 @@ function computeScenario(monthlyIncome, savingsRatePct, returnRatePct, years) {
 }
 
 function renderScenarioComparison() {
-  const cur = Store.state.settings.defaultCurrency;
   const p = Store.state.planning;
+  const cur = p.currency || Store.state.settings.defaultCurrency;
   const yearsA = Math.max(0, p.retirementAge - p.age);
   const a = computeScenario(p.monthlyIncome, p.savingsRatePct, p.returnRatePct, yearsA);
 
@@ -172,6 +174,12 @@ function initPlanningHandlers() {
       renderPlanningResults();
       if (!document.getElementById("compareScenariosPanel").hidden) renderScenarioComparison();
     });
+  });
+
+  document.getElementById("pl-currency").addEventListener("change", () => {
+    Store.updatePlanning(readPlanningInputs());
+    renderPlanningResults();
+    if (!document.getElementById("compareScenariosPanel").hidden) renderScenarioComparison();
   });
 
   const scenarioBIds = ["plb-income", "plb-savings-rate", "plb-return-rate", "plb-years"];
