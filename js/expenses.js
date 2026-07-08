@@ -74,7 +74,7 @@ function renderTxnStatsAndTable() {
   tbody.innerHTML = txns.map((t) => `
     <tr data-id="${t.id}">
       <td>${fmtDate(t.date)}</td>
-      <td>${categoryIconLabel(t.category)}</td>
+      <td>${categoryIconLabelHtml(t.category)}</td>
       <td>${escapeHtml(Store.accountName(t.accountId)) || "&mdash;"}</td>
       <td>${escapeHtml(t.note || "")}</td>
       <td class="amount ${t.type}">${t.type === "expense" ? "-" : "+"}${fmtMoney(t.amount, t.currency)}</td>

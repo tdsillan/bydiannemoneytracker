@@ -153,7 +153,13 @@ async function fetchMidMarketRate(date, from, to) {
 
 function categoryIconLabel(name) {
   const icon = Store.state.appearance.categoryIcons[name];
-  return icon ? `${icon} ${escapeHtml(name)}` : escapeHtml(name);
+  if (icon && !isImageIcon(icon)) return `${icon} ${escapeHtml(name)}`;
+  return escapeHtml(name);
+}
+
+function categoryIconLabelHtml(name) {
+  const icon = Store.state.appearance.categoryIcons[name];
+  return icon ? `${iconDisplayHtml(icon, 16)} ${escapeHtml(name)}` : escapeHtml(name);
 }
 
 function currencyOptionsHtml(selected) {

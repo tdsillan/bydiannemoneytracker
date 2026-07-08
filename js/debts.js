@@ -7,9 +7,9 @@ function renderDebts() {
 
 function ofwCategoryLabel(value) {
   const found = OFW_DEBT_CATEGORIES.find((c) => c.value === value);
-  const label = found ? found.label : value;
+  const label = escapeHtml(found ? found.label : value);
   const icon = Store.state.appearance.debtCategoryIcons[value];
-  return icon ? `${icon} ${label}` : label;
+  return icon ? `${iconDisplayHtml(icon, 14)} ${label}` : label;
 }
 
 function ofwCategoryOptionsHtml(selected) {
@@ -176,7 +176,7 @@ function debtCardHtml(debt) {
           <div class="entity-sub">${subLine}</div>
         </div>
         <div style="display:flex; gap:6px; align-items:flex-start; flex-wrap:wrap; justify-content:flex-end;">
-          ${isDebt ? `<span class="badge account">${escapeHtml(ofwCategoryLabel(debt.ofwCategory))}</span>` : ""}
+          ${isDebt ? `<span class="badge account">${ofwCategoryLabel(debt.ofwCategory)}</span>` : ""}
           ${accountBadgeHtml(debt.accountId)}
           <span class="badge ${isDebt ? "debt" : "loan"}">${isDebt ? "I owe" : "Owed to me"}</span>
         </div>

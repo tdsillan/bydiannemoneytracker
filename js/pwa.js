@@ -144,9 +144,14 @@ function initInstallPrompt() {
 }
 
 function initServiceWorker() {
-  if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("sw.js").catch(() => {});
-  }
+  if (!("serviceWorker" in navigator)) return;
+  navigator.serviceWorker.register("sw.js").catch(() => {});
+  let hasReloaded = false;
+  navigator.serviceWorker.addEventListener("controllerchange", () => {
+    if (hasReloaded) return;
+    hasReloaded = true;
+    location.reload();
+  });
 }
 
 function initPWA() {

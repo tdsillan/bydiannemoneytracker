@@ -202,7 +202,7 @@ function renderCategoryChart() {
   const max = entries[0][1];
   el.innerHTML = entries.map(([cat, amount]) => `
     <div class="cat-row">
-      <span class="cat-name">${categoryIconLabel(cat)}</span>
+      <span class="cat-name">${categoryIconLabelHtml(cat)}</span>
       <div class="cat-bar-track"><div class="cat-bar-fill" style="width:${(amount / max) * 100}%"></div></div>
       <span class="cat-amount">${fmtMoney(amount, dashboardChartCurrency)}</span>
     </div>

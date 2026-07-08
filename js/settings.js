@@ -74,7 +74,7 @@ function renderCategoryTags(kind, containerId) {
   const cats = Store.state.categories[kind];
   el.innerHTML = cats.map((c) => `
     <span class="tag">
-      <button type="button" class="tag-icon-btn" data-cat="${escapeHtml(c)}" title="Change icon">${Store.state.appearance.categoryIcons[c] || "•"}</button>
+      <button type="button" class="tag-icon-btn" data-cat="${escapeHtml(c)}" title="Change icon">${Store.state.appearance.categoryIcons[c] ? iconDisplayHtml(Store.state.appearance.categoryIcons[c], 14) : "•"}</button>
       ${escapeHtml(c)}
       <button data-kind="${kind}" data-cat="${escapeHtml(c)}" title="Remove">&times;</button>
     </span>
