@@ -1,5 +1,5 @@
-const CACHE_VERSION = "v13";
-const ASSET_VERSION = "13";
+const CACHE_VERSION = "v14";
+const ASSET_VERSION = "14";
 const CACHE_NAME = `finance-tracker-${CACHE_VERSION}`;
 
 const APP_SHELL = [

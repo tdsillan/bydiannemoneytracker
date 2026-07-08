@@ -146,9 +146,9 @@ async function fetchMidMarketRate(date, from, to) {
       return null;
     }
   };
-  const historical = await tryUrl(`https://api.frankfurter.app/${date}?from=${from}&to=${to}`);
+  const historical = await tryUrl(`https://api.frankfurter.dev/v1/${date}?from=${from}&to=${to}`);
   if (historical) return historical;
-  return tryUrl(`https://api.frankfurter.app/latest?from=${from}&to=${to}`);
+  return tryUrl(`https://api.frankfurter.dev/v1/latest?from=${from}&to=${to}`);
 }
 
 function categoryIconLabel(name) {
