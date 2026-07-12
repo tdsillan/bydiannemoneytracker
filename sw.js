@@ -1,5 +1,5 @@
-const CACHE_VERSION = "v16";
-const ASSET_VERSION = "16";
+const CACHE_VERSION = "v17";
+const ASSET_VERSION = "17";
 const CACHE_NAME = `finance-tracker-${CACHE_VERSION}`;
 
 const APP_SHELL = [
@@ -17,6 +17,7 @@ const APP_SHELL = [
   `./js/debts.js?v=${ASSET_VERSION}`,
   `./js/goals.js?v=${ASSET_VERSION}`,
   `./js/expenses.js?v=${ASSET_VERSION}`,
+  `./js/import.js?v=${ASSET_VERSION}`,
   `./js/remittances.js?v=${ASSET_VERSION}`,
   `./js/networth.js?v=${ASSET_VERSION}`,
   `./js/contributions.js?v=${ASSET_VERSION}`,

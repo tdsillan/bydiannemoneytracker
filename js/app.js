@@ -25,6 +25,7 @@ function initTopLevelButtons() {
   document.getElementById("addDebtBtn").addEventListener("click", () => openDebtForm());
   document.getElementById("addGoalBtn").addEventListener("click", () => openGoalForm());
   document.getElementById("addTxnBtn").addEventListener("click", () => openTxnForm());
+  document.getElementById("importCsvBtn").addEventListener("click", () => openImportModal());
   document.getElementById("addRecurringBtn").addEventListener("click", () => openRecurringForm());
   document.getElementById("addRemittanceBtn").addEventListener("click", () => openRemittanceForm());
   document.getElementById("addInvestmentBtn").addEventListener("click", () => openInvestmentForm());
