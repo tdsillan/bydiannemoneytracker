@@ -33,6 +33,7 @@ function defaultState() {
     debts: [],
     goals: [],
     transactions: [],
+    transfers: [],
     recurringIncomes: [
       { id: "rec-salary", name: "Salary", amount: 0, currency: "SEK", category: "Salary", accountId: "acc-wise", dayOfMonth: 25 },
       { id: "rec-allowance", name: "Allowance", amount: 0, currency: "EUR", category: "Allowance", accountId: "acc-revolut", dayOfMonth: 15 },
@@ -131,6 +132,7 @@ const Store = {
       if (!d.ofwCategory) d.ofwCategory = d.debtType === "revolving" ? "credit_card" : "personal_loan";
     });
     if (!Array.isArray(s.remittances)) s.remittances = [];
+    if (!Array.isArray(s.transfers)) s.transfers = [];
     if (!Array.isArray(s.investments)) s.investments = [];
     if (!Array.isArray(s.contributionPrograms) || s.contributionPrograms.length === 0) s.contributionPrograms = defaultState().contributionPrograms;
     if (!Array.isArray(s.contributionPayments)) s.contributionPayments = [];
@@ -204,11 +206,12 @@ const Store = {
     this.save();
   },
 
-  recordDebtPayment(id, amount, date, note) {
+  recordDebtPayment(id, amount, date, note, fromAccountId) {
     const debt = this.state.debts.find((d) => d.id === id);
     if (!debt) return;
-    debt.history.push({ id: crypto.randomUUID(), amount, date, note: note || "" });
+    debt.history.push({ id: crypto.randomUUID(), amount, date, note: note || "", fromAccountId: fromAccountId || "" });
     debt.balance = Math.max(0, +(debt.balance - amount).toFixed(2));
+    if (fromAccountId) this.adjustAccountBalance(fromAccountId, debt.currency, -amount);
     this.save();
   },
 
@@ -232,7 +235,7 @@ const Store = {
     this.save();
   },
 
-  recordGoalContribution(id, amount, date, note, origin) {
+  recordGoalContribution(id, amount, date, note, origin, fromAccountId) {
     const goal = this.state.goals.find((g) => g.id === id);
     if (!goal) return;
     const entry = { id: crypto.randomUUID(), amount, date, note: note || "" };
@@ -243,6 +246,21 @@ const Store = {
     }
     goal.history.push(entry);
     goal.currentAmount = +(goal.currentAmount + amount).toFixed(2);
+    if (fromAccountId) {
+      const sourceCurrency = (origin && origin.currency) || goal.currency;
+      const sourceAmount = (origin && origin.amount) || amount;
+      this.adjustAccountBalance(fromAccountId, sourceCurrency, -sourceAmount);
+    }
+    this.save();
+  },
+
+  recordGoalWithdrawal(id, amount, date, note, toAccountId) {
+    const goal = this.state.goals.find((g) => g.id === id);
+    if (!goal) return;
+    const withdrawAmount = Math.min(amount, goal.currentAmount);
+    goal.history.push({ id: crypto.randomUUID(), amount: -withdrawAmount, date, note: note || "" });
+    goal.currentAmount = +(goal.currentAmount - withdrawAmount).toFixed(2);
+    if (toAccountId) this.adjustAccountBalance(toAccountId, goal.currency, withdrawAmount);
     this.save();
   },
 
@@ -267,6 +285,25 @@ const Store = {
     const txn = this.state.transactions.find((t) => t.id === id);
     if (txn) this.applyTransactionToBalance(txn, -1);
     this.state.transactions = this.state.transactions.filter((t) => t.id !== id);
+    this.save();
+  },
+
+  addTransfer(t) {
+    t.id = crypto.randomUUID();
+    this.state.transfers.push(t);
+    this.adjustAccountBalance(t.fromAccountId, t.currency, -t.amount);
+    this.adjustAccountBalance(t.toAccountId, t.currency, t.amount);
+    this.save();
+    return t;
+  },
+
+  deleteTransfer(id) {
+    const t = this.state.transfers.find((x) => x.id === id);
+    if (t) {
+      this.adjustAccountBalance(t.fromAccountId, t.currency, t.amount);
+      this.adjustAccountBalance(t.toAccountId, t.currency, -t.amount);
+    }
+    this.state.transfers = this.state.transfers.filter((x) => x.id !== id);
     this.save();
   },
 
@@ -295,21 +332,32 @@ const Store = {
     this.save();
   },
 
+  applyRemittanceToBalance(r, sign) {
+    if (!r.accountId) return;
+    this.adjustAccountBalance(r.accountId, r.currency, -(r.amountSent + r.feePaid) * sign);
+  },
+
   addRemittance(r) {
     r.id = crypto.randomUUID();
     this.state.remittances.push(r);
+    this.applyRemittanceToBalance(r, 1);
     this.save();
     return r;
   },
 
   updateRemittance(id, patch) {
     const r = this.state.remittances.find((x) => x.id === id);
-    if (r) Object.assign(r, patch);
+    if (!r) return;
+    this.applyRemittanceToBalance(r, -1);
+    Object.assign(r, patch);
+    this.applyRemittanceToBalance(r, 1);
     this.save();
   },
 
   deleteRemittance(id) {
-    this.state.remittances = this.state.remittances.filter((r) => r.id !== id);
+    const r = this.state.remittances.find((x) => x.id === id);
+    if (r) this.applyRemittanceToBalance(r, -1);
+    this.state.remittances = this.state.remittances.filter((x) => x.id !== id);
     this.save();
   },
 

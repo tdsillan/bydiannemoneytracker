@@ -29,6 +29,7 @@ function initTopLevelButtons() {
   document.getElementById("addRecurringBtn").addEventListener("click", () => openRecurringForm());
   document.getElementById("addRemittanceBtn").addEventListener("click", () => openRemittanceForm());
   document.getElementById("addInvestmentBtn").addEventListener("click", () => openInvestmentForm());
+  document.getElementById("transferBtn").addEventListener("click", () => openTransferForm());
 }
 
 function initExpenseFilters() {

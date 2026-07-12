@@ -118,6 +118,62 @@ function openAccountBalanceForm(account) {
   });
 }
 
+function openTransferForm() {
+  const accounts = Store.state.accounts;
+  if (accounts.length < 2) { showToast("Add at least two accounts first"); return; }
+  Modal.open("Transfer between accounts", `
+    <div class="form-row two">
+      <label>From
+        <select id="f-from-account">${accountOptionsHtml(accounts[0].id)}</select>
+      </label>
+      <label>To
+        <select id="f-to-account">${accountOptionsHtml(accounts[1].id)}</select>
+      </label>
+    </div>
+    <div class="form-row two">
+      <label>Amount
+        <input type="number" id="f-amount" min="0" step="0.01">
+      </label>
+      <label>Currency
+        <select id="f-currency">${currencyOptionsHtml(Store.state.settings.defaultCurrency)}</select>
+      </label>
+    </div>
+    <div class="form-row two">
+      <label>Date
+        <input type="date" id="f-date" value="${todayISO()}">
+      </label>
+      <label>Note (optional)
+        <input type="text" id="f-note">
+      </label>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" id="cancelBtn">Cancel</button>
+      <button class="btn-primary" id="saveBtn">Transfer</button>
+    </div>
+  `, (body) => {
+    body.querySelector("#cancelBtn").addEventListener("click", () => Modal.close());
+    body.querySelector("#saveBtn").addEventListener("click", () => {
+      const fromAccountId = body.querySelector("#f-from-account").value;
+      const toAccountId = body.querySelector("#f-to-account").value;
+      const amount = parseFloat(body.querySelector("#f-amount").value);
+      if (!amount || amount <= 0) { showToast("Enter a valid amount"); return; }
+      if (!fromAccountId || !toAccountId) { showToast("Pick both accounts"); return; }
+      if (fromAccountId === toAccountId) { showToast("Pick two different accounts"); return; }
+      Store.addTransfer({
+        fromAccountId,
+        toAccountId,
+        amount,
+        currency: body.querySelector("#f-currency").value,
+        date: body.querySelector("#f-date").value || todayISO(),
+        note: body.querySelector("#f-note").value.trim(),
+      });
+      Modal.close();
+      renderDashboard();
+      showToast("Transfer recorded");
+    });
+  });
+}
+
 function renderChartCurrencySelect() {
   const select = document.getElementById("chartCurrencySelect");
   const currencies = allCurrenciesInUse();
@@ -292,8 +348,17 @@ function renderRecentActivity() {
   Store.state.transactions.forEach((t) => events.push({ date: t.date, text: `${t.type === "expense" ? "Spent" : "Received"} ${fmtMoney(t.amount, t.currency)} &middot; ${escapeHtml(t.category)}`, meta: t.note || "" }));
   Store.state.debts.forEach((d) => d.history.forEach((h) => events.push({ date: h.date, text: `Paid ${fmtMoney(h.amount, d.currency)} towards ${escapeHtml(d.name)}`, meta: h.note || "" })));
   Store.state.goals.forEach((g) => g.history.forEach((h) => {
+    if (h.amount < 0) {
+      events.push({ date: h.date, text: `Withdrew ${fmtMoney(-h.amount, g.currency)} from ${escapeHtml(g.name)}`, meta: h.note || "" });
+      return;
+    }
     const original = h.originalCurrency ? ` (${fmtMoney(h.originalAmount, h.originalCurrency)} @ ${h.rate})` : "";
     events.push({ date: h.date, text: `Added ${fmtMoney(h.amount, g.currency)}${original} to ${escapeHtml(g.name)}`, meta: h.note || "" });
+  }));
+  Store.state.transfers.forEach((t) => events.push({
+    date: t.date,
+    text: `Transferred ${fmtMoney(t.amount, t.currency)} from ${escapeHtml(Store.accountName(t.fromAccountId))} to ${escapeHtml(Store.accountName(t.toAccountId))}`,
+    meta: t.note || "",
   }));
 
   events.sort((a, b) => (a.date < b.date ? 1 : -1));

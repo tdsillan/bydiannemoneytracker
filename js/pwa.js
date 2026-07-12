@@ -1,5 +1,5 @@
 let deferredInstallPrompt = null;
-const SW_VERSION = "17";
+const SW_VERSION = "18";
 
 function drawDefaultIcon(ctx, size) {
   const accent = Store.state.settings.accentColor || "#2563eb";

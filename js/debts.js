@@ -375,6 +375,11 @@ function openDebtPaymentForm(debt) {
     </div>
     ${debt.debtType === "revolving" ? `<p class="muted small">Minimum due this cycle: ${fmtMoney(madAmountFor(debt), debt.currency)}. Paying less than the full balance will roll the rest over.</p>` : ""}
     <div class="form-row">
+      <label>Paying from <span class="muted small">(optional — decreases that account's balance)</span>
+        <select id="f-payment-account">${accountOptionsHtml(debt.accountId)}</select>
+      </label>
+    </div>
+    <div class="form-row">
       <label>Note (optional)
         <input type="text" id="f-note">
       </label>
@@ -388,7 +393,13 @@ function openDebtPaymentForm(debt) {
     body.querySelector("#saveBtn").addEventListener("click", () => {
       const amount = parseFloat(body.querySelector("#f-amount").value);
       if (!amount || amount <= 0) { showToast("Enter a valid amount"); return; }
-      Store.recordDebtPayment(debt.id, amount, body.querySelector("#f-date").value || todayISO(), body.querySelector("#f-note").value.trim());
+      Store.recordDebtPayment(
+        debt.id,
+        amount,
+        body.querySelector("#f-date").value || todayISO(),
+        body.querySelector("#f-note").value.trim(),
+        body.querySelector("#f-payment-account").value
+      );
       Modal.close();
       renderDebts();
       renderDashboard();

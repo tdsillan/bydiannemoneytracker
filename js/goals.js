@@ -21,6 +21,7 @@ function renderGoals() {
           showToast("Deleted");
         }
       } else if (action === "contribute") openGoalContributionForm(goal);
+      else if (action === "withdraw") openGoalWithdrawalForm(goal);
     });
   });
 
@@ -137,6 +138,7 @@ function goalCardHtml(goal) {
       </div>
       <div class="entity-actions">
         <button class="btn-secondary small" data-action="contribute" data-id="${goal.id}">Add funds</button>
+        ${goal.currentAmount > 0 ? `<button class="btn-secondary small" data-action="withdraw" data-id="${goal.id}">Withdraw</button>` : ""}
         <button class="btn-secondary small" data-action="edit" data-id="${goal.id}">Edit</button>
         <button class="btn-danger small" data-action="delete" data-id="${goal.id}">Delete</button>
       </div>
@@ -224,6 +226,11 @@ function openGoalContributionForm(goal) {
         <input type="text" id="f-note">
       </label>
     </div>
+    <div class="form-row">
+      <label>Taking from <span class="muted small">(optional — decreases that account's balance)</span>
+        <select id="f-source-account">${accountOptionsHtml(goal.accountId)}</select>
+      </label>
+    </div>
     <div class="modal-actions">
       <button class="btn-secondary" id="cancelBtn">Cancel</button>
       <button class="btn-primary" id="saveBtn">Add</button>
@@ -284,12 +291,59 @@ function openGoalContributionForm(goal) {
         convertedAmount,
         body.querySelector("#f-date").value || todayISO(),
         body.querySelector("#f-note").value.trim(),
-        { amount, currency: from, rate }
+        { amount, currency: from, rate },
+        body.querySelector("#f-source-account").value
       );
       Modal.close();
       renderGoals();
       renderDashboard();
       showToast("Funds added");
+    });
+  });
+}
+
+function openGoalWithdrawalForm(goal) {
+  Modal.open(`Withdraw &middot; ${escapeHtml(goal.name)}`, `
+    <p class="muted small">Currently saved: ${fmtMoney(goal.currentAmount, goal.currency)}</p>
+    <div class="form-row two">
+      <label>Amount (${goal.currency})
+        <input type="number" id="f-amount" min="0" max="${goal.currentAmount}" step="0.01">
+      </label>
+      <label>Date
+        <input type="date" id="f-date" value="${todayISO()}">
+      </label>
+    </div>
+    <div class="form-row">
+      <label>Goes to <span class="muted small">(optional — increases that account's balance)</span>
+        <select id="f-dest-account">${accountOptionsHtml(goal.accountId)}</select>
+      </label>
+    </div>
+    <div class="form-row">
+      <label>Note (optional)
+        <input type="text" id="f-note" placeholder="e.g. Emergency car repair">
+      </label>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" id="cancelBtn">Cancel</button>
+      <button class="btn-danger" id="saveBtn">Withdraw</button>
+    </div>
+  `, (body) => {
+    body.querySelector("#cancelBtn").addEventListener("click", () => Modal.close());
+    body.querySelector("#saveBtn").addEventListener("click", () => {
+      const amount = parseFloat(body.querySelector("#f-amount").value);
+      if (!amount || amount <= 0) { showToast("Enter a valid amount"); return; }
+      if (amount > goal.currentAmount) { showToast("Can't withdraw more than what's saved"); return; }
+      Store.recordGoalWithdrawal(
+        goal.id,
+        amount,
+        body.querySelector("#f-date").value || todayISO(),
+        body.querySelector("#f-note").value.trim(),
+        body.querySelector("#f-dest-account").value
+      );
+      Modal.close();
+      renderGoals();
+      renderDashboard();
+      showToast("Funds withdrawn");
     });
   });
 }
