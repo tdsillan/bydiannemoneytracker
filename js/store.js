@@ -249,17 +249,23 @@ const Store = {
   addTransaction(txn) {
     txn.id = crypto.randomUUID();
     this.state.transactions.push(txn);
+    this.applyTransactionToBalance(txn, 1);
     this.save();
     return txn;
   },
 
   updateTransaction(id, patch) {
     const txn = this.state.transactions.find((t) => t.id === id);
-    if (txn) Object.assign(txn, patch);
+    if (!txn) return;
+    this.applyTransactionToBalance(txn, -1);
+    Object.assign(txn, patch);
+    this.applyTransactionToBalance(txn, 1);
     this.save();
   },
 
   deleteTransaction(id) {
+    const txn = this.state.transactions.find((t) => t.id === id);
+    if (txn) this.applyTransactionToBalance(txn, -1);
     this.state.transactions = this.state.transactions.filter((t) => t.id !== id);
     this.save();
   },
@@ -377,6 +383,20 @@ const Store = {
     const acc = this.state.accounts.find((a) => a.id === id);
     if (acc) acc.balances = balances;
     this.save();
+  },
+
+  adjustAccountBalance(accountId, currency, delta) {
+    if (!accountId || !delta) return;
+    const acc = this.state.accounts.find((a) => a.id === accountId);
+    if (!acc) return;
+    if (!acc.balances) acc.balances = {};
+    acc.balances[currency] = +((acc.balances[currency] || 0) + delta).toFixed(2);
+  },
+
+  applyTransactionToBalance(txn, sign) {
+    if (!txn.accountId) return;
+    const delta = (txn.type === "income" ? txn.amount : -txn.amount) * sign;
+    this.adjustAccountBalance(txn.accountId, txn.currency, delta);
   },
 
   addRecurringIncome(entry) {
